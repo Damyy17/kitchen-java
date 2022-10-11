@@ -1,45 +1,44 @@
-package com.example.kitchenn.entity;
+// package com.example.kitchenn.entity;
 
-import com.example.kitchenn.service.OrderService;
+// import java.net.URISyntaxException;
+// import java.util.concurrent.locks.ReentrantLock;
 
-import java.net.URISyntaxException;
+// import org.springframework.beans.factory.annotation.Autowired;
 
-public class Cook implements Runnable{
+// import com.example.kitchenn.service.OrderService;
 
-    String name;
-    OrderService orderService = new OrderService();
-    Kitchen kitchen;
+// public class Cook implements Runnable{
 
-    public Cook(String name){
-        this.name = name;
-    }
+//     String name;
+//     ReentrantLock mutex = new ReentrantLock();
 
-    @Override
-    public void run() {
-        System.out.println("Started thread " + name );
-        try {
-            Thread.sleep(6000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (kitchen.isEmpty()){
-                Thread.sleep(0);
-            } else {
-                orderService.sendOrderBack(kitchen.takeOrder());
-            }
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Ended thread " + name);
-        
-    }
-}
+//     @Autowired
+//     OrderService orderService;
+
+//     public Cook(String name){
+//         this.name = name;
+//     }
+
+//     @Override
+//     public void run() {
+//         System.out.println("Started thread " + name );
+
+//         try {
+//             Thread.sleep(4000);
+//         } catch (InterruptedException e) {
+//             // TODO Auto-generated catch block
+//             e.printStackTrace();
+//         }
+//         while(true){
+//             mutex.lock();
+//             // if (!orderService.isEmpty()) {
+//             //     try {
+//             //         orderService.sendOrderBack();
+//             //     } catch (URISyntaxException e) {
+//             //         e.printStackTrace();
+//             //     }
+//             // }
+//             mutex.unlock();
+//         }
+//     }
+// }
