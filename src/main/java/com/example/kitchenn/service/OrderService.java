@@ -2,6 +2,8 @@ package com.example.kitchenn.service;
 
 import com.example.kitchenn.entity.Order;
 
+import com.example.kitchenn.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -15,15 +17,16 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class OrderService {
 
-    private static BlockingQueue<Order> kitchenQueue = new LinkedBlockingQueue<>();
+    private static final BlockingQueue<Order> kitchenQueue = new LinkedBlockingQueue<>();
     final static int NR_OF_THREADS = 5;
     static ReentrantLock mutex = new ReentrantLock();
-    OrderService orderService;
 
+    @Autowired
+    private OrderRepository orderRepository;
 
     public static void sendOrderBack(Order order) throws URISyntaxException {
         RestTemplate restTemplate = new RestTemplate();
-        final String baseUrl = "http://127.0.0.1:7001/distribution";
+        final String baseUrl = "http://127.0.0.1:7003/aggregator2";
         URI uri = new URI(baseUrl);
 
         try {
@@ -35,22 +38,20 @@ public class OrderService {
 
     public static void runServerWithThreads(){
         for (int i = 1; i <= NR_OF_THREADS; i++) {
-            new Thread(() -> sendToDiningHall()).start();
+            new Thread(OrderService::sendToDiningHall).start();
         }
     }
 
     public static void sendToDiningHall(){
         while(true){
             mutex.lock();
-            if (!kitchenQueue.isEmpty()) {
+            if (!checkIfEmpty()) {
                 Order order;
                 try {
-                    order = kitchenQueue.take();
+                    order = takeOrder();
                     sendOrderBack(order);
-                } catch (URISyntaxException e) {
+                } catch (URISyntaxException | InterruptedException e) {
                     e.printStackTrace();
-                }catch (InterruptedException e1) {
-                    e1.printStackTrace();
                 }
                 try {
                     Thread.sleep(3000);
@@ -63,7 +64,15 @@ public class OrderService {
     }
 
     public void addOrder(Order order){
-        kitchenQueue.add(order);
+        orderRepository.addData(order);
+    }
+
+    public static Order takeOrder() throws InterruptedException {
+        return OrderRepository.takeOrder();
+    }
+
+    public static boolean checkIfEmpty(){
+        return OrderRepository.checkIfEmpty();
     }
 
 }
