@@ -17,7 +17,7 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping(path = "/order", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Order> receiveOrder(@RequestBody Order order) {
+    public ResponseEntity<Order> receiveOrder(@RequestBody Order order) throws InterruptedException {
         System.out.println(order.toString());
         orderService.addOrder(order);
 

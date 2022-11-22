@@ -9,16 +9,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Repository
 public class OrderRepository {
     private static final BlockingQueue<Order> data = new LinkedBlockingQueue<>();
+    private int maxSize;
+    private final Object FULL_QUEUE = new Object();
+    private final Object EMPTY_QUEUE = new Object();
 
-    public void addData(Order order){
-        data.add(order);
+    public void addData(Order order) throws InterruptedException {
+        data.put(order);
     }
 
     public static Order takeOrder() throws InterruptedException {
         return data.take();
     }
 
-    public static boolean checkIfEmpty(){
-        return data.isEmpty();
-    }
 }
